@@ -1,6 +1,4 @@
 # Pathfinding-Visualizer
- # 🎯 Advanced Pathfinding Visualizer
-
 > A modern, interactive web application for visualizing pathfinding algorithms with beautiful animations and dark UI design.
 
 ![Pathfinding Visualizer Demo](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
