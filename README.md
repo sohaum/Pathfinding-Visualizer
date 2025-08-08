@@ -301,13 +301,12 @@ https://github.com/sohaum/Pathfinding-Visualizer/issues
 https://github.com/sohaum/Pathfinding-Visualizer/discussions
 
 # Direct Contact
-email: your.email@example.com
-twitter: @yourusername
+email: sohaumghosh@gmail.com
 ```
 
 ## 🙏 Acknowledgments
 
-- Inspired by @clementmihailescu 's Pathfinding Visualizer
+- Inspired by [Clement Mihailescu's](https://github.com/clementmihailescu) Pathfinding Visualizer
 - Maze generation algorithm based on Prim's algorithm
 - UI design inspired by modern glassmorphism trends
 - Color palette from Tailwind CSS
