@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Pathfinding Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Pathfinding Visualizer</h1>
+        <div class="controls">
+            <div class="control-group">
+                <label>Algorithm:</label>
+                <select id="algorithm">
+                    <option value="dijkstra">Dijkstra's Algorithm</option>
+                    <option value="astar">A* Algorithm</option>
+                    <option value="bfs">Breadth-First Search</option>
+                    <option value="dfs">Depth-First Search</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Speed:</label>
+                <input type="range" id="speed" min="1" max="10" value="5" class="speed-slider">
+                <span id="speed-value">5x</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="start-btn" class="btn-primary">Start Pathfinding</button>
+                <button id="clear-path">Clear Path</button>
+                <button id="clear-walls">Clear Walls</button>
+                <button id="generate-maze">Generate Maze</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="grid-container">
+            <div id="grid" class="grid"></div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color start"></div>
+                    <span>Start Node</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color end"></div>
+                    <span>End Node</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color wall"></div>
+                    <span>Wall</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color visited"></div>
+                    <span>Visited</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color path"></div>
+                    <span>Shortest Path</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h3>Statistics</h3>
+            <div class="stat-item">
+                <span class="stat-label">Nodes Visited:</span>
+                <span id="nodes-visited" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Path Length:</span>
+                <span id="path-length" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Time Elapsed:</span>
+                <span id="time-elapsed" class="stat-value">0ms</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Algorithm:</span>
+                <span id="current-algorithm" class="stat-value">Dijkstra's</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>How to Use:</h3>
+        <ul>
+            <li><strong>Click and drag</strong> the start (green) and end (red) nodes to move them</li>
+            <li><strong>Click and drag</strong> on empty cells to draw walls</li>
+            <li><strong>Right-click</strong> to remove walls</li>
+            <li>Choose an algorithm and click "Start Pathfinding" to visualize</li>
+            <li>Use "Generate Maze" for interesting patterns to solve</li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
