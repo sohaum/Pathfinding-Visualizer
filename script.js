@@ -1,10 +1,9 @@
 class PathfindingVisualizer {
     constructor() {
-        this.rows = 25;
-        this.cols = 50;
+        this.setGridSize();
         this.grid = [];
-        this.startNode = { row: 12, col: 10 };
-        this.endNode = { row: 12, col: 40 };
+        this.startNode = { row: Math.floor(this.rows / 2), col: Math.floor(this.cols / 4) };
+        this.endNode = { row: Math.floor(this.rows / 2), col: Math.floor(3 * this.cols / 4) };
         this.isDrawing = false;
         this.isDragging = null;
         this.isRunning = false;
@@ -15,6 +14,51 @@ class PathfindingVisualizer {
         
         this.init();
         this.bindEvents();
+        this.handleResize();
+    }
+
+    setGridSize() {
+        const width = window.innerWidth;
+        if (width < 480) {
+            this.rows = 20;
+            this.cols = 25;
+        } else if (width < 768) {
+            this.rows = 22;
+            this.cols = 30;
+        } else if (width < 1024) {
+            this.rows = 24;
+            this.cols = 40;
+        } else {
+            this.rows = 25;
+            this.cols = 50;
+        }
+    }
+
+    handleResize() {
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (this.isRunning) return;
+                
+                const oldRows = this.rows;
+                const oldCols = this.cols;
+                
+                this.setGridSize();
+                
+                if (oldRows !== this.rows || oldCols !== this.cols) {
+                    // Adjust start and end node positions if they're out of bounds
+                    this.startNode.row = Math.min(this.startNode.row, this.rows - 1);
+                    this.startNode.col = Math.min(this.startNode.col, this.cols - 1);
+                    this.endNode.row = Math.min(this.endNode.row, this.rows - 1);
+                    this.endNode.col = Math.min(this.endNode.col, this.cols - 1);
+                    
+                    this.createGrid();
+                    this.renderGrid();
+                    this.updateStats();
+                }
+            }, 250);
+        });
     }
 
     init() {
@@ -79,11 +123,16 @@ class PathfindingVisualizer {
         const algorithmSelect = document.getElementById('algorithm');
         const speedSlider = document.getElementById('speed');
 
-        // Grid events
+        // Grid events with touch support
         grid.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         grid.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         grid.addEventListener('mouseup', () => this.handleMouseUp());
         grid.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Touch events for mobile
+        grid.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        grid.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        grid.addEventListener('touchend', () => this.handleTouchEnd());
 
         // Control events
         startBtn.addEventListener('click', () => this.startPathfinding());
@@ -103,6 +152,40 @@ class PathfindingVisualizer {
 
         // Prevent drag on the entire document
         document.addEventListener('dragstart', (e) => e.preventDefault());
+    }
+
+    handleTouchStart(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (cell && cell.classList.contains('cell')) {
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                button: 0
+            });
+            mouseEvent.target = cell;
+            this.handleMouseDown(mouseEvent);
+        }
+    }
+
+    handleTouchMove(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (cell && cell.classList.contains('cell')) {
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                buttons: 1
+            });
+            mouseEvent.target = cell;
+            this.handleMouseMove(mouseEvent);
+        }
+    }
+
+    handleTouchEnd() {
+        this.handleMouseUp();
     }
 
     handleMouseDown(e) {
@@ -202,23 +285,27 @@ class PathfindingVisualizer {
         this.startTime = Date.now();
         
         let result;
-        switch (algorithm) {
-            case 'dijkstra':
-                result = await this.dijkstra();
-                break;
-            case 'astar':
-                result = await this.aStar();
-                break;
-            case 'bfs':
-                result = await this.bfs();
-                break;
-            case 'dfs':
-                result = await this.dfs();
-                break;
-        }
+        try {
+            switch (algorithm) {
+                case 'dijkstra':
+                    result = await this.dijkstra();
+                    break;
+                case 'astar':
+                    result = await this.aStar();
+                    break;
+                case 'bfs':
+                    result = await this.bfs();
+                    break;
+                case 'dfs':
+                    result = await this.dfs();
+                    break;
+            }
 
-        if (result.path) {
-            await this.animatePath(result.path);
+            if (result.path) {
+                await this.animatePath(result.path);
+            }
+        } catch (error) {
+            console.error('Pathfinding error:', error);
         }
 
         this.isRunning = false;
@@ -426,13 +513,15 @@ class PathfindingVisualizer {
         if (node.row === this.endNode.row && node.col === this.endNode.col) return;
 
         const cell = document.querySelector(`[data-row="${node.row}"][data-col="${node.col}"]`);
-        cell.classList.add(type);
+        if (cell) {
+            cell.classList.add(type);
 
-        if (type === 'visited') {
-            this.visitedCount++;
+            if (type === 'visited') {
+                this.visitedCount++;
+            }
+
+            await this.delay(Math.max(1, 101 - (this.speed * 10)));
         }
-
-        await this.delay(101 - (this.speed * 10));
     }
 
     async animatePath(path) {
@@ -441,9 +530,11 @@ class PathfindingVisualizer {
         for (let i = 1; i < path.length - 1; i++) {
             const node = path[i];
             const cell = document.querySelector(`[data-row="${node.row}"][data-col="${node.col}"]`);
-            cell.classList.remove('visited');
-            cell.classList.add('path');
-            await this.delay(50);
+            if (cell) {
+                cell.classList.remove('visited');
+                cell.classList.add('path');
+                await this.delay(50);
+            }
         }
     }
 
@@ -499,7 +590,9 @@ class PathfindingVisualizer {
                 
                 this.grid[row][col].isWall = true;
                 const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-                cell.classList.add('wall');
+                if (cell) {
+                    cell.classList.add('wall');
+                }
             }
         }
 
@@ -509,7 +602,9 @@ class PathfindingVisualizer {
         
         this.grid[startRow][startCol].isWall = false;
         const startCell = document.querySelector(`[data-row="${startRow}"][data-col="${startCol}"]`);
-        startCell.classList.remove('wall');
+        if (startCell) {
+            startCell.classList.remove('wall');
+        }
 
         // Add neighboring walls to the list
         this.addNeighboringWalls(startRow, startCol, walls);
@@ -526,7 +621,9 @@ class PathfindingVisualizer {
             if (pathNeighbors.length === 1) {
                 this.grid[row][col].isWall = false;
                 const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-                cell.classList.remove('wall');
+                if (cell) {
+                    cell.classList.remove('wall');
+                }
                 
                 this.addNeighboringWalls(row, col, walls);
             }
@@ -539,8 +636,8 @@ class PathfindingVisualizer {
         const startNodeCell = document.querySelector(`[data-row="${this.startNode.row}"][data-col="${this.startNode.col}"]`);
         const endNodeCell = document.querySelector(`[data-row="${this.endNode.row}"][data-col="${this.endNode.col}"]`);
         
-        startNodeCell.classList.remove('wall');
-        endNodeCell.classList.remove('wall');
+        if (startNodeCell) startNodeCell.classList.remove('wall');
+        if (endNodeCell) endNodeCell.classList.remove('wall');
     }
 
     addNeighboringWalls(row, col, walls) {
@@ -602,18 +699,15 @@ class PathfindingVisualizer {
 
 // Initialize the visualizer when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new PathfindingVisualizer();
+    const visualizer = new PathfindingVisualizer();
+    
+    // Make visualizer globally accessible
+    window.pathfindingVisualizer = visualizer;
 
     // Update stats periodically while running
     setInterval(() => {
-        const visualizer = window.pathfindingVisualizer;
-        if (visualizer && visualizer.isRunning) {
+        if (visualizer.isRunning) {
             visualizer.updateStats();
         }
     }, 100);
-});
-
-// Make visualizer globally accessible
-window.addEventListener('load', () => {
-    window.pathfindingVisualizer = new PathfindingVisualizer();
 });
