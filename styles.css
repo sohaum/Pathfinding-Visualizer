@@ -18,7 +18,7 @@ body {
     backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem 2rem;
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -621,3 +621,4 @@ button:hover {
         max-width: calc(100vw - 1.5rem);
     }
 }
+
