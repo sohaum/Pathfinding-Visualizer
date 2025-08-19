@@ -36,8 +36,32 @@
     </div>
 
     <div class="main-content">
+        <div class="stats-panel">
+            <h3>Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Nodes Visited:</span>
+                    <span id="nodes-visited" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Path Length:</span>
+                    <span id="path-length" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Time Elapsed:</span>
+                    <span id="time-elapsed" class="stat-value">0ms</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Algorithm:</span>
+                    <span id="current-algorithm" class="stat-value">Dijkstra's</span>
+                </div>
+            </div>
+        </div>
+
         <div class="grid-container">
-            <div id="grid" class="grid"></div>
+            <div id="grid" class="grid" style="grid-template-columns: repeat(50, 1fr); grid-template-rows: repeat(25, 1fr);">
+                <!-- Grid cells will be generated here -->
+            </div>
             
             <div class="legend">
                 <div class="legend-item">
@@ -62,26 +86,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="stats-panel">
-            <h3>Statistics</h3>
-            <div class="stat-item">
-                <span class="stat-label">Nodes Visited:</span>
-                <span id="nodes-visited" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Path Length:</span>
-                <span id="path-length" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Time Elapsed:</span>
-                <span id="time-elapsed" class="stat-value">0ms</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Algorithm:</span>
-                <span id="current-algorithm" class="stat-value">Dijkstra's</span>
-            </div>
-        </div>
     </div>
 
     <div class="instructions">
@@ -94,7 +98,7 @@
             <li>Use "Generate Maze" for interesting patterns to solve</li>
         </ul>
     </div>
-
-    <script src="script.js"></script>
 </body>
+</html>
+
 </html>
