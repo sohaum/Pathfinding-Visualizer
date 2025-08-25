@@ -11,6 +11,7 @@ class PathfindingVisualizer {
         this.visitedCount = 0;
         this.pathLength = 0;
         this.startTime = 0;
+        this.finalTime = 0; // Store final elapsed time
         
         this.init();
         this.bindEvents();
@@ -141,13 +142,18 @@ class PathfindingVisualizer {
         generateMazeBtn.addEventListener('click', () => this.generateMaze());
         
         algorithmSelect.addEventListener('change', (e) => {
-            document.getElementById('current-algorithm').textContent = 
-                e.target.options[e.target.selectedIndex].text;
+            const currentAlgElement = document.getElementById('current-algorithm');
+            if (currentAlgElement) {
+                currentAlgElement.textContent = e.target.options[e.target.selectedIndex].text;
+            }
         });
         
         speedSlider.addEventListener('input', (e) => {
             this.speed = parseInt(e.target.value);
-            document.getElementById('speed-value').textContent = `${this.speed}x`;
+            const speedValueElement = document.getElementById('speed-value');
+            if (speedValueElement) {
+                speedValueElement.textContent = `${this.speed}x`;
+            }
         });
 
         // Prevent drag on the entire document
@@ -283,6 +289,7 @@ class PathfindingVisualizer {
         startBtn.disabled = true;
         
         this.startTime = Date.now();
+        this.finalTime = 0; // Reset final time
         
         let result;
         try {
@@ -308,6 +315,8 @@ class PathfindingVisualizer {
             console.error('Pathfinding error:', error);
         }
 
+        // Calculate final time BEFORE setting isRunning to false
+        this.finalTime = Date.now() - this.startTime;
         this.isRunning = false;
         startBtn.textContent = 'Start Pathfinding';
         startBtn.disabled = false;
@@ -541,6 +550,7 @@ class PathfindingVisualizer {
     clearPath() {
         this.visitedCount = 0;
         this.pathLength = 0;
+        this.finalTime = 0; // Reset final time when clearing
         
         const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => {
@@ -685,11 +695,23 @@ class PathfindingVisualizer {
     }
 
     updateStats() {
-        document.getElementById('nodes-visited').textContent = this.visitedCount;
-        document.getElementById('path-length').textContent = this.pathLength;
-        
-        const timeElapsed = this.isRunning ? Date.now() - this.startTime : 0;
-        document.getElementById('time-elapsed').textContent = `${timeElapsed}ms`;
+        const nodesVisitedElement = document.getElementById('nodes-visited');
+        const pathLengthElement = document.getElementById('path-length');
+        const timeElapsedElement = document.getElementById('time-elapsed');
+
+        if (nodesVisitedElement) {
+            nodesVisitedElement.textContent = this.visitedCount;
+        }
+        if (pathLengthElement) {
+            pathLengthElement.textContent = this.pathLength;
+        }
+        if (timeElapsedElement) {
+            // Show real-time elapsed time while running, final time when finished
+            const timeElapsed = this.isRunning 
+                ? (this.startTime > 0 ? Date.now() - this.startTime : 0)
+                : this.finalTime;
+            timeElapsedElement.textContent = `${timeElapsed}ms`;
+        }
     }
 
     delay(ms) {
