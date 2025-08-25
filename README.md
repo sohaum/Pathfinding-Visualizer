@@ -215,14 +215,13 @@ async greedyBestFirst() {
 
 ## 🌟 Screenshots
 
-```bash
-# Main Interface
+### Main Interface
 <img width="946" height="411" alt="1" src="https://github.com/user-attachments/assets/49bab8e0-8bd6-47f4-a180-c59fbc8f4629" />
 <img width="944" height="496" alt="2" src="https://github.com/user-attachments/assets/385b1678-75c7-4428-9c5b-8189aa4b6637" />
 <img width="935" height="329" alt="3" src="https://github.com/user-attachments/assets/e257e22c-d525-4247-97e0-30e46d097b37" />
 
-# Legend: 🟢 Start, 🔴 End, ██ Wall, 🔵 Visited, 🟡 Path
-```
+### Legend: 🟢 Start, 🔴 End, ██ Wall, 🔵 Visited, 🟡 Path
+
 
 ## 🤝 Contributing
 
