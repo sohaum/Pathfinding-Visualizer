@@ -429,37 +429,48 @@ class PathfindingVisualizer {
     }
 
     async dfs() {
-        const stack = [];
-        const visitedNodes = [];
-        const startNode = this.grid[this.startNode.row][this.startNode.col];
+    const visitedNodes = [];
+    const startNode = this.grid[this.startNode.row][this.startNode.col];
+    startNode.distance = 0;
+    
+    const dfsRecursive = async (node) => {
+        // Mark as visited
+        node.isVisited = true;
+        visitedNodes.push(node);
         
-        stack.push(startNode);
-
-        while (stack.length > 0) {
-            const current = stack.pop();
-            
-            if (current.isVisited) continue;
-            
-            current.isVisited = true;
-            visitedNodes.push(current);
-
-            if (current.row === this.endNode.row && current.col === this.endNode.col) {
-                return { visitedNodes, path: this.getPath(current) };
-            }
-
-            const neighbors = this.getNeighbors(current);
-            for (const neighbor of neighbors.reverse()) {
-                if (!neighbor.isVisited && !neighbor.isWall) {
-                    neighbor.previousNode = current;
-                    stack.push(neighbor);
+        // Visualize the node
+        await this.visualizeNode(node, 'visited');
+        
+        // Check if we reached the end
+        if (node.row === this.endNode.row && node.col === this.endNode.col) {
+            return true; // Found the target
+        }
+        
+        // Explore neighbors
+        const neighbors = this.getNeighbors(node);
+        
+        for (const neighbor of neighbors) {
+            if (!neighbor.isVisited && !neighbor.isWall) {
+                neighbor.previousNode = node;
+                neighbor.distance = node.distance + 1;
+                
+                if (await dfsRecursive(neighbor)) {
+                    return true; // Found path through this neighbor
                 }
             }
-
-            await this.visualizeNode(current, 'visited');
         }
-
-        return { visitedNodes, path: null };
-    }
+        
+        return false; // No path found through this node
+    };
+    
+    const found = await dfsRecursive(startNode);
+    const endNode = this.grid[this.endNode.row][this.endNode.col];
+    
+    return { 
+        visitedNodes, 
+        path: found ? this.getPath(endNode) : null 
+    };
+}
 
     heuristic(nodeA, nodeB) {
         // Manhattan distance
@@ -733,3 +744,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 100);
 });
+
